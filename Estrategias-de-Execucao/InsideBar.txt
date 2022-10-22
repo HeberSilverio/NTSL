@@ -1,0 +1,10 @@
+{CÓDIGO PARA COMPRAR A MERCADO CASO ACONTEÇA UM INSIDE BAR}
+
+//Códigos sempre estão entre begin e end. O nome disto é bloco de código.
+
+begin
+   //testar se é um inside bar com o teste lógico SE e o deslocamento.
+   se (Mínima[0]>Mínima[1]) e (Máxima[0]<Máxima[1]) então
+   //se for, então executar a mercado
+   BuyAtMarker;
+end;
