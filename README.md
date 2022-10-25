@@ -6,13 +6,12 @@ NTSL - Nelogica Trading System Language
  
 * Documentação NTSL - <a href="https://ajuda.nelogica.com.br/hc/pt-br/articles/360046443212-Documenta%C3%A7%C3%A3o-NTSL-Compilado-de-fun%C3%A7%C3%B5es-e-instru%C3%A7%C3%B5es-de-usabilidade">Compilado de funções e instruções de usabilidade</a> 
 
-* Desafio dia 02 - <a href="https://github.com/HeberSilverio/30diasDeCSS#desafio-dia-02---loader-animado">Loader animado</a> 
+* <a href="https://github.com/HeberSilverio/NTSL/tree/main/Estrategias-de-Execucao">Estratégias de Execução</a> 
 
-Comentários: {} ou //
 
-Indexação
-- Candle atual = [0]
-- Candles prévios = [1],[2],[3], etc
+TESTES ÍNDICE 33HILO
+
+TESTE DOLAR 36HILO
 
 Funções do NTSL
 

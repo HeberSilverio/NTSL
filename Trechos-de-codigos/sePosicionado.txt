@@ -1,0 +1,29 @@
+/////////////////////////////////////////////////////////////
+//                         Martelo                         //
+/////////////////////////////////////////////////////////////
+begin
+  // Verifica se está comprado
+  if (IsBought) then
+    begin
+        // Fecha a posição com uma venda caso o IFR
+        // esteja superior a 70 (sobrecomprado)
+        if (RSI(9, 0) > 70) then
+        SellToCoverAtMarket;
+    end
+  
+  // Verifica se está vendido
+  else if (IsSold) then
+    begin
+      // Fecha a posição com uma compra caso o IFR
+      // esteja inferior a 30 (sobrevendido)
+      if (RSI(9,0) < 30)
+      BuyToCoverAtMarket;
+    end
+
+    // Verifica se deve abrir uma posição, 
+    // com o ativo sobrecomprado ou sobrevendido
+    else if (RSI(9, 0)[1] < 30) and (RSI(9, 0) > 30) then
+      BuyAtMarket
+    else if (RSI(9, 0)[1] > 70) and (RSI(9, 0) < 30) then
+      SellShortAtMarket;
+end;
