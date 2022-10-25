@@ -11,7 +11,7 @@ NTSL - Nelogica Trading System Language
 
 TESTES ÍNDICE 33HILO
 
-TESTE DOLAR 36HILO
+TESTE DOLAR 21HILO
 
 Funções do NTSL
 
