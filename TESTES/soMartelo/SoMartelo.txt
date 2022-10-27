@@ -1,0 +1,19 @@
+Inicio
+   Se (IsSold) então
+      Inicio
+         Se (Fechamento > Abertura) e (Minima < Abertura[1]) então
+            BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought) então
+      Inicio
+         Se (Fechamento < Abertura) e (Maxima > Abertura[1]) então
+            SellToCoverAtMarket;
+      fim
+   Senão
+      Inicio
+         Se (Fechamento > Abertura) e (Minima < Abertura[1]) então
+            BuyAtMarket
+         Senão Se (Fechamento < Abertura) e (Maxima > Abertura[1]) então
+            SellShortAtMarket;
+      Fim;
+Fim;

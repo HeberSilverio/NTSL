@@ -1,0 +1,57 @@
+{   CÓDIGO PARA COMPRAR A MERCADO CASO FAÇO MARTELO ACIMA DO HILO
+
+MELHOR PERFORMANCE
+- Tempo de gráfico de melhor resultado 13Renko
+- valor_gain := High + (Range * 1.3);
+- valor_loss := Low + (range * 0.4);
+FATOR DE LUCRO 2,36 ANO
+
+- A compra é feita a mercado
+- Saídas são realizadas por ordens oco
+- GAIN é a amplitude do candle projetada a partir da sua máxima
+- LOSS é a amplitude do candle projetada a partir da sua mínima
+SE EU ESTOU POSICIONADO, IGNORAR ENTRADAS (APENAS UM TRADE POR VEZ)
+}
+//declarando as variáveis
+var
+  sinal_compra          : boolean;
+  valor_gain,valor_loss : float;
+begin
+  // Coloração
+  begin
+    if (close > HILOACTIVATOR(33)) then
+      PaintBar(clAzulClaro)
+    else 
+      PaintBar(clCinzaEscuro);
+  end;
+  //PARTE 1 - capturando sinal para abrir posição na mão compradora numa variável para facilitar leitura
+  sinal_compra := (Fechamento > Abertura) e (Minima < Minima[1]) e (Fechamento > HILOACTIVATOR(33));
+  //PARTE 2 - se acontece o sinal de compra e eu não estou comprado
+  se (sinal_compra = Verdadeiro) e Not (IsBought) então
+    begin
+      //deixar evidente que o sinal aconteceu com coloração
+      PaintBar(clVerdeLimão);
+      //executar uma ordem de compra a mercado;
+      BuyAtMarket;
+      //calcular valores de gain e de loss;
+      valor_gain := High + (Range * 1.4);
+      valor_loss := Low + (range * 0.4);
+      //inserir ordens de venda para fechar posição (ToCover, se comportam exatamente como uma OCO!)
+      SellToCoverLimit(valor_gain);
+      //gain é uma ordem de venda limite
+      SellToCoverStop(valor_loss,valor_loss);
+      //stop é uma ordem de venda stop
+      end;
+      //PARTE 3 -  se eu já estou comprado
+      se IsBought então
+        begin
+          //continuar inserindo ordens de venda para fechar posição (ToCover, se comportam exatamente como uma OCO!)
+          SellToCoverLimit(valor_gain);
+          //gain é uma ordem de venda limite
+          SellToCoverStop(valor_loss,valor_loss);
+          //stop é uma ordem de venda stop
+          //prevenção contra gaps, executar a mercado caso a ordem de loss tenha sido pulada
+          se Low < valor_loss então
+            SellToCoverAtMarket;
+        end;
+    end;
