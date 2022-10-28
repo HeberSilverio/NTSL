@@ -1,0 +1,21 @@
+Inicio
+   Se (IsSold) então
+      Inicio
+         Se (close > HILOACTIVATOR(500)) então
+            BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought) então
+      Inicio
+         Se (close < HILOACTIVATOR(500)) então
+            SellToCoverAtMarket;
+      fim
+   Senão
+      Inicio
+         Se (close[1] < HILOACTIVATOR(500)) and (close > HILOACTIVATOR(500)) então
+            BuyAtMarket;
+            PaintBar(clVerdeLimão);
+         Senão Se (close[1] > HILOACTIVATOR(500)) and (close < HILOACTIVATOR(500)) então
+            SellShortAtMarket;
+            PaintBar(clVermelho);
+      Fim;
+Fim;

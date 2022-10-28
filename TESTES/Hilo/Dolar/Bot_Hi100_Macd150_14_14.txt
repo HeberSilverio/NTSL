@@ -1,0 +1,26 @@
+Inicio
+   Inicio
+      Se (close > HILOACTIVATOR(100)) então
+         PaintBar(clVerde)
+      Senão Se (close < HILOACTIVATOR(100)) então
+         PaintBar(clMarrom); 
+   fim;
+   Se (IsSold) então
+      Inicio
+         Se (close > HILOACTIVATOR(100)) então
+            BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought) então
+      Inicio
+         Se (close < HILOACTIVATOR(100)) então
+            SellToCoverAtMarket;
+      fim
+   Senão
+      Inicio
+         Se (Fechamento > HiloActivator(100)) e (MACD(150,14,14) > 0) então
+            BuyAtMarket
+         Senão Se (Fechamento < HiloActivator(100)) e (MACD(150,14,14) < 0) então
+            SellShortAtMarket;
+            PaintBar(clVermelho);
+      Fim;
+Fim;

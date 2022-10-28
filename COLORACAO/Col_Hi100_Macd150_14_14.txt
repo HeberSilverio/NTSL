@@ -1,0 +1,6 @@
+Inicio
+   Se (Fechamento > HiloActivator(100)[1]) e (maCD(150,14,14) > 0) então
+      PaintBar(clVerde)
+   Senão Se (Fechamento < HiloActivator(100)[1]) e (maCD(150,14,14) < 0) então
+      PaintBar(clMarrom); 
+Fim;

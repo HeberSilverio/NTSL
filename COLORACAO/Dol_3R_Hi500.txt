@@ -1,0 +1,6 @@
+Inicio
+   Se (close > HILOACTIVATOR(500)) então
+      PaintBar(clVerde)
+   Senão Se (close < HILOACTIVATOR(500)) então
+      PaintBar(clMarrom); 
+Fim;

@@ -1,0 +1,26 @@
+Inicio
+   Inicio
+      Se (Fechamento > MediaExp(9,Close)[4]) então
+         PaintBar(clVerde)
+      Senão Se (Fechamento < MediaExp(9,Close)[4]) então
+         PaintBar(clMarrom); 
+   fim;
+   Se (IsSold) então
+      Inicio
+         Se (Fechamento > MediaExp(9,Close)[4]) então
+            BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought) então
+      Inicio
+         Se (Fechamento < MediaExp(9,Close)[4]) então
+            SellToCoverAtMarket;
+      fim
+   Senão
+      Inicio
+         Se (Fechamento > MediaExp(9,Close)[4]) e (MACD(150,14,14) > 0) então
+            BuyAtMarket
+         Senão Se (Fechamento < MediaExp(9,Close)[4]) e (MACD(150,14,14) < 0) então
+            SellShortAtMarket;
+            PaintBar(clVermelho);
+      Fim;
+Fim;

@@ -1,0 +1,6 @@
+Inicio
+      Se (Fechamento > HiloActivator(500)[1]) e (maCD(150,14,14) > 0) então
+        BuyAtMarket
+      Senão Se (Fechamento < HiloActivator(500)[1]) e (maCD(150,14,14) < 0) então
+        SellShortAtMarket;
+Fim;
