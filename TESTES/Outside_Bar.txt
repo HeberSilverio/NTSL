@@ -1,0 +1,42 @@
+{   CÓDIGO PARA COMPRAR A MERCADO CASO ACONTEÇA UM OUTSIDE BAR
+   - A compra é feita a mercado
+   - Entrada apenas se martelo está direcionado para cima
+   - Saídas são realizadas por TrailingStopLimit
+   SE EU ESTOU POSICIONADO, IGNORAR ENTRADAS (APENAS UM TRADE POR VEZ)
+
+   MELHOR PERFORMANCE NO ÍNDICE 4R
+}
+
+//declarando as variáveis
+var
+   sinal_compra : boolean;
+   valor_gain, valor_loss : float;
+
+begin
+   //PARTE 1 - capturando sinal para abrir posição na mão compradora numa variável para facilitar leitura
+   sinal_compra := ((Mínima[0] < Mínima[1]) e (Máxima[0] > Máxima[1]) e (Fechamento > Abertura));
+   
+   //PARTE 2 - se acontece o sinal de compra e eu não estou comprado
+   se (sinal_compra = Verdadeiro) e Not(IsBought) então
+      begin
+         //deixar evidente que o sinal aconteceu com coloração
+         PaintBar(clGreen);
+         //executar uma ordem de compra a mercado;
+         BuyAtMarket;
+      end;
+
+   //PARTE 3 -  se eu já estou comprado
+      // Verifica se está comprado,
+      // Se estiver envia um TrailingStopLimit na Venda
+   if (IsBought) then
+      begin
+         SellToCoverStop(Low[1]);
+      end
+
+      // Verifica se deve abrir uma posição,
+      // com o ativo sobrecomprado ou sobrevendido
+   else if (IsSold) then
+      begin
+         BuyToCoverStop(High[1]);
+      end; 
+end;
