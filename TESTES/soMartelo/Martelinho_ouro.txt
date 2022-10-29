@@ -1,0 +1,32 @@
+{   CÓDIGO PARA COMPRAR A MERCADO CASO FAÇO MARTELO ACIMA DO HILO
+
+MELHOR PERFORMANCE
+- renko de 13r - Fator de lucro 2,21 semestral
+- renko de 18r - Fator de lucro 2,37 semestral
+}
+
+Inicio
+  Inicio
+    Se (close > HILOACTIVATOR(8)) então
+      PaintBar(clVerde)
+    Senão Se (close < HILOACTIVATOR(8)) então
+      PaintBar(clMarrom);
+  Fim;
+  Se (IsSold) então
+    Inicio
+      Se (close > HILOACTIVATOR(8)) então
+        BuyToCoverAtMarket;
+    fim
+  Senão Se (IsBought) então
+    Inicio
+      Se (close < HILOACTIVATOR(8)) então
+        SellToCoverAtMarket;
+    fim
+  Senão 
+    Inicio
+      Se ((Fechamento > Abertura) e (Minima < Abertura)) e (close > HILOACTIVATOR(8)) e (maCD(150,14,14) > 1) então
+        BuyAtMarket
+      Senão Se ((Fechamento < Abertura) e (Maxima > Abertura)) e (close < HILOACTIVATOR(8)) e (maCD(150,14,14) < 1) então
+        SellShortAtMarket;
+    Fim;
+Fim;

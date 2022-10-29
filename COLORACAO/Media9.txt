@@ -1,0 +1,6 @@
+Inicio
+   Se (Fechamento > MediaExp(9,Close)[4]) então
+      PaintBar(clVerde)
+   Senão Se (Fechamento < MediaExp(9,Close)[4]) então
+      PaintBar(clMarrom); 
+Fim;

@@ -1,0 +1,30 @@
+Inicio
+   Se (close > HILOACTIVATOR(8)) e (maCD(150,14,14) > 0) então
+      PaintBar(clVerde)
+   Senão Se (close < HILOACTIVATOR(8)) e (maCD(150,14,14) < 0) então
+      PaintBar(clMarrom);
+Fim;
+
+
+begin
+   if((Fechamento > Abertura) e (Minima < Abertura)) e (close > HILOACTIVATOR(8)) e (maCD(150,14,14) > 1) then
+      PaintBar(clVerdeLimão)
+   else if((Fechamento < Abertura) e (Maxima > Abertura)) e (close < HILOACTIVATOR(8)) e (maCD(150,14,14) < 1) then
+      PaintBar(clVermelho)
+   else if (close > HILOACTIVATOR(8)) e (maCD(150,14,14) > 1) then
+      PaintBar(clVerde)
+   else
+      PaintBar(clMarrom);
+end;
+
+//VERSÃO 2
+begin
+   if((Fechamento > Abertura) e (Minima < Abertura)) e (close > HILOACTIVATOR(8)) e (maCD(30,14,14) > 1) then
+      PaintBar(clVerdeLimão)
+   else if((Fechamento < Abertura) e (Maxima > Abertura)) e (MACD(30,4,4) < 1) e (close < HILOACTIVATOR(8)) then
+      PaintBar(clVermelho)
+   else if (close > HILOACTIVATOR(8)) e (maCD(150,14,14) > 1) then
+      PaintBar(clVerde)
+   else
+      PaintBar(clCinzaEscuro);
+end;

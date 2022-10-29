@@ -1,0 +1,19 @@
+Inicio
+   Se (IsSold) então
+      Inicio
+         Se (Fechamento > Abertura) e (Minima < Abertura[1]) e (Fechamento > MediaExp(9,Close)[4]) e (MACD(150,14,14) > 0) então
+            BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought) então
+      Inicio
+         Se (Fechamento < Abertura) e (Maxima > Abertura[1]) e (Fechamento < MediaExp(9,Close)[4]) e (MACD(150,14,14) < 0) então
+            SellToCoverAtMarket;
+      fim
+   Senão
+      Inicio
+         Se (Fechamento > Abertura) e (Minima < Abertura[1]) e (Fechamento > MediaExp(9,Close)[4]) e (MACD(150,14,14) > 0) então
+            BuyAtMarket
+         Senão Se (Fechamento < Abertura) e (Maxima > Abertura[1]) e (Fechamento < MediaExp(9,Close)[4]) e (MACD(150,14,14) < 0) então
+            SellShortAtMarket;
+      Fim;
+Fim;

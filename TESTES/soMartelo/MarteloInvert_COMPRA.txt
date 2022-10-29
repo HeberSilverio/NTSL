@@ -1,0 +1,32 @@
+Inicio
+   //Coloração
+   Inicio
+      Se (close > HILOACTIVATOR(100)) então
+         PaintBar(clVerde)
+      Senão Se (close < HILOACTIVATOR(100)) então
+         PaintBar(clMarrom); 
+   fim; 
+   //Condição para iniciar a operação
+   Inicio
+      Se (Fechamento > Abertura) e (Minima < Abertura[1]) então
+         SellShortAtMarket
+      Senão Se (Fechamento < Abertura) e (Maxima > Abertura[1]) então
+         BuyAtMarket;
+   Fim;
+   //calcular valores de gain e de loss;
+   valor_gain := High + Range;
+   valor_loss := Low - Range;
+
+   Se (IsSold) então
+      Inicio
+         BuyToCoverLimit(valor_gain); 
+         BuyToCoverStop(valor_loss,valor_loss);
+      fim
+   Senão Se (IsBought) então
+      Inicio
+         SellToCoverLimit(valor_gain); 
+         SellToCoverStop(valor_loss,valor_loss);
+      fim
+   Senão
+      
+Fim;
