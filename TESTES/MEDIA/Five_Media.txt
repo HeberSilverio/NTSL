@@ -1,0 +1,39 @@
+var mean = (Fechamento > media(1,Close)[1]) e (Fechamento > media(5,Close)[1]) e (Fechamento > media(12,Close)[1]) e (Fechamento > media(14,Close)[1]);
+
+var 
+smaa : float;
+smab  : float;
+smaao : float;
+smabo : float;
+
+sourceSeries : float;
+mad : float;
+mean : float;
+
+var sourceSeries = (Fechamento > media(5,Close)[1]) e (Fechamento > media(12,Close)[1]);
+
+var mad = sourceSeries - mean;
+
+smaa = sma(3,close);
+smab = sma(50,close);
+smaao = sma(3,open);
+smabo = sma(50,open);
+
+  
+Se (mad <= 0) e ( mad[1] > mad) e (smaa < smab) e (smaao > smabo) e (close  <= emaa) then
+   Inicio
+      //venda
+      PaintBar(clVermelho);
+   fim
+
+else if ( mad >= 0) and (mad > mad[1]) and (smaa > smab) and (close >= emaa) and (smaao < smabo) then 
+   Inicio
+      //Compra
+      PaintBar(clVerde);
+   fim
+
+
+Inicio
+  Se  então
+    PaintBar(clVerde);
+Fim;
