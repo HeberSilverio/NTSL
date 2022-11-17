@@ -1,0 +1,32 @@
+input 
+
+gainReaisC(0);  
+lossReaisC(0);  
+gainReaisV(0); 
+lossReaisV(0);  
+
+//Conversão automatica de gain e loss em reais dos parâmetres/input pra pontos 
+
+ 
+     if minPriceIncrement = 5 then //indice WIN
+      begin
+          gainC := gainReaisC * 5;
+          lossC := lossReaisC * 5;
+          gainV := gainReaisV * 5;
+          lossV := lossReaisV * 5;
+      end
+      else if minPriceIncrement = 0.5 then //dolar WDO
+        begin
+          gainC := gainReaisC / 10;
+          lossC := lossReaisC / 10;
+          gainV := gainReaisV / 10;
+          lossV := lossReaisV / 10;
+        end
+
+        else 
+        begin // valor padrão pontos = reais
+          gainC := gainReaisC; 
+          lossC := lossReaisC;
+          gainV := gainReaisV; 
+          lossV := lossReaisV; 
+        end;

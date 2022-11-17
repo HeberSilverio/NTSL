@@ -1,0 +1,55 @@
+{   CÓDIGO PARA COMPRAR A MERCADO CASO FAÇO MARTELO ACIMA DO HILO
+
+MELHOR PERFORMANCE
+- renko de 13r - Fator de lucro 2,21 semestral
+- renko de 18r - Fator de lucro 2,37 semestral
+}
+var
+ValorMACD : float;
+SinalCompra : boolean;
+SinalVenda : boolean;
+ValorHilo : float;
+DistanciaHiloCompra : boolean;
+DistanciaHiloVenda : boolean;
+MarteloCompra : boolean;
+MarteloVenda : boolean;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
+pCompra : float;
+pVenda : float;
+
+Inicio
+   ValorMACD := MACD(130,19,19)|1|;
+   ValorHilo := (HILOACTIVATOR(33));
+   DistanciaHiloCompra := ((Fechamento - ValorHilo) < 500);
+   DistanciaHiloVenda := ((ValorHilo - Fechamento) < 500);
+   MarteloCompra := ((Fechamento > Abertura) e (Minima < Abertura));
+   MarteloVenda := ((Fechamento < Abertura) e (Maxima > Abertura));
+   SinalCompra := ((MarteloCompra = Verdadeiro) e (DistanciaHiloCompra = Verdadeiro) e (time < 1700));
+   SinalVenda := ((MarteloVenda = Verdadeiro) e (DistanciaHiloVenda = Verdadeiro) e (time < 1700));
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   StopGainCompra := ((Fechamento - pCompra) >= 6);  
+   StopGainVenda := ((pVenda - Fechamento) >= 6); 
+  Se (IsSold) então
+    Inicio
+      Se (StopGainVenda = Verdadeiro) então
+        BuyToCoverAtMarket
+      Senão Se (close > HILOACTIVATOR(33)) ou (Time > 1740) então
+        BuyToCoverAtMarket;
+    fim
+  Senão Se (IsBought) então
+    Inicio
+      Se (StopGainCompra = Verdadeiro) então
+        SellToCoverAtMarket 
+      Senão Se (close < HILOACTIVATOR(33)) ou (Time > 1740) então
+        SellToCoverAtMarket;
+    fim
+  Senão 
+    Inicio
+      Se ( (close > HILOACTIVATOR(33)) e (ValorMACD > 0) e (SinalCompra = Verdadeiro) ) então
+        BuyAtMarket
+      Senão Se ( (ValorMACD < 0) e (close < HILOACTIVATOR(33)) e (SinalVenda = Verdadeiro) )  então
+        SellShortAtMarket;
+    Fim;
+Fim;
