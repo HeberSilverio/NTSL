@@ -1,0 +1,51 @@
+// -----------------------------------------------------------------------
+// ---------------------- DADOS DA ESTRATÉGIA ----------------------------
+// -----------------------------------------------------------------------
+//
+//  NOME DA ESTRATÉGIA: Bot_IFR_Retorno
+//    DESENVOLVIDA POR: Héber Silvério
+//     DATA DE CRIAÇÃO: 14/12/2022
+//              VERSÃO: 1.0
+//       ATUALIZADA EM: 14/12/2022
+//  TIPO DE ESTRATÉGIA: ( ) Indicador  (x) Coloração (X) Execução
+//                      ( ) Screening  ( ) Texto     ( ) Alarme
+//
+// DESCRIÇÃO DA ESTRATÉGIA:
+//      Esta estratégia considera HeikinAshi e Hilo para tomada de decisão
+//
+//  MELHOR PERFORMANCE:
+//    Ativo: WINFUT
+//  Periodo: 25 renko
+// -----------------------------------------------------------------------
+
+
+input
+   //LinhaInferior(30);
+   //LinhaSuperior(70);
+   iQtdePeriodosIFR(9);
+   
+var
+fIFR : real;
+iFundoIFR : float;
+iTopoIFR : float; 
+SinalCompra: boolean;
+SinalVenda: boolean;
+
+begin
+   iFundoIFR := 25;
+   iTopoIFR := 75; 
+
+   fIFR := RSI(iQtdePeriodosIFR, 0);
+   
+   SinalCompra := (fIFR > iFundoIFR) and (fIFR[1] < iFundoIFR);
+   SinalVenda := (fIFR < iTopoIFR) and (fIFR[1] > iTopoIFR);
+
+
+   if (SinalCompra = Verdadeiro) then 
+      PaintBar(clVerdeLimão)
+   else if  (SinalVenda = Verdadeiro) then 
+      PaintBar(clVermelho)
+   else
+      PaintBar(clCinzaEscuro);
+end;
+

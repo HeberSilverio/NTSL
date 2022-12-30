@@ -1,0 +1,43 @@
+//INDICADOR PROGRAMADO POR GABRIEL ALVIM
+//CANAL YOUTUBE: https://www.youtube.com/channel/UCxZaNx9hvtkAXgqugP5EH9Q
+//GRUPO NO FACEBOOK: https://www.facebook.com/groups/estrategiasprofit
+
+input
+  Período(6);
+  Suavização(14);
+  Preço(close);
+  NívelSobrecompra(80);
+  NívelIntermediario(50);
+  NívelSobrevenda(20);
+var
+  MA_s              : float;
+  r1,r2,r3,r4,r5,rr : float;
+  MA_s2             : float;
+begin
+  r1 := mediaexp(Período,Preço);
+  if Preço > r1 then
+    r2 := Preço - r1
+  else 
+    r2 := 0;
+  if Preço < r1 then
+    R3 := r1 - Preço
+  else 
+    R3 := 0;
+  MA_s := (r2 + (MA_s[1] * (Suavização - 1))) / Suavização;
+  r4 := MA_s;
+  MA_s2 := (r3 + (MA_s2[1] * (Suavização - 1))) / Suavização;
+  r5 := MA_s2;
+  if r5 = 0 then
+    rr := 100
+  else 
+    rr := 100 - (100 / (1 + (r4 / r5)));
+  plot(rr);
+  plot2(NívelSobrecompra);
+  plot3(NívelIntermediario);
+  plot4(NívelSobrevenda);
+
+  if rr > rr[1] then
+  setplotcolor(1,cllime);
+    if rr < rr[1] then
+  setplotcolor(1,clred);
+end;

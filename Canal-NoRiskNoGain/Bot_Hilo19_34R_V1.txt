@@ -1,0 +1,83 @@
+//-----------------------------------------------------------------------
+// ---------------------- DADOS DA ESTRATÉGIA ----------------------------
+// -----------------------------------------------------------------------
+//
+//  NOME DA ESTRATÉGIA: Bot_Hilo19_34R_V1
+//    DESENVOLVIDA POR: Héber Silvério
+//     DATA DE CRIAÇÃO: 29/12/2022
+//              VERSÃO: 1.0
+//       ATUALIZADA EM: -
+//  TIPO DE ESTRATÉGIA: ( ) Indicador  ( ) Coloração (X) Execução
+//                      ( ) Screening  ( ) Texto     ( ) Alarme
+//
+// DESCRIÇÃO DA ESTRATÉGIA:
+//      Esta estratégia considera Hilo19 para tomada de decisão
+//      Stop de 220 e alvo de 1.6
+//  MELHOR PERFORMANCE:
+//    Ativo: WINFUT
+//  Periodo: 34 renko
+//  Com Stop 200 - Alvo 1.6 - 67,5% Acerto
+//  Com Stop 220 - Alvo 1.6 - 64,4% Acerto
+//  (Periodo de teste 01-11-2022 a 29-12-2022)
+// -----------------------------------------------------------------------
+
+Input
+PeriodoHilo(19);
+Stop(220);
+Alvo(1.6);
+
+var
+resultHilo : Float;
+Subindo : boolean;
+Descendo : boolean;
+SinalCompra: boolean;
+SinalVenda: boolean;
+
+Inicio
+  
+   resultHilo := HiloActivator(PeriodoHilo)|1|;
+   Subindo := (fechamento[1] > fechamento[2]) e (fechamento[2] > fechamento[3]);
+   Descendo := (fechamento[1] < fechamento[2]) e (fechamento[2] < fechamento[3]);
+
+   SinalCompra:= (fechamento > fechamento[1]) e (Descendo = Verdadeiro) e (resultHilo = 1);
+   SinalVenda:= (fechamento < fechamento[1]) e (Subindo = Verdadeiro) e (resultHilo = 0);
+
+
+  Se (IsBought) então
+    Inicio
+      //Stop da compra
+      SellToCoverStop(Buyprice-Stop, Buyprice-Stop-100);
+      //Alvo da compra
+      SellTocoverLimit(Buyprice+(Alvo*Stop));
+    Fim;
+
+  Se (IsSold) então
+    Inicio
+      //Stop de venda
+      BuyToCoverStop(Sellprice+Stop, Sellprice+Stop+100);
+      //Alvo da venda
+      BuyToCoverLimit(Sellprice-(Alvo*Stop));
+    Fim;
+
+  Se (BuyPosition = 0) e (SellPosition = 0) então //Verifica se existe posição
+    Inicio
+      Se (SinalCompra = Verdadeiro) então
+        Inicio
+          BuyAtMarket;
+        Fim;
+      
+      Se (SinalVenda = Verdadeiro) então
+        Inicio
+          SellShortAtMarket;
+        Fim;
+    Fim;
+
+   if (Time >= 1759) and isBought then ClosePosition;
+   if (Time >= 1759) and isSold then ClosePosition;
+
+    //Coloração
+      if (SinalCompra = Verdadeiro) then 
+         PaintBar(clVerde);
+      if (SinalVenda = Verdadeiro) then 
+         PaintBar(clMarrom);
+Fim;

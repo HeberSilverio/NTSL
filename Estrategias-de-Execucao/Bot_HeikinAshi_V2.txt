@@ -1,0 +1,149 @@
+// #########################################################################
+// #########################################################################
+// #########################################################################
+// ######                            O                               #######
+// ######                        ____|____                           #######
+// ######                      _|         |_                         #######
+// ######                     (_|  O   O  |_)                        #######
+// ######                       |_________|                          #######
+// ######                                                            #######
+// ######                                                            #######
+// ######     ________             ____         __    ___        __  #######
+// ######   /  _____  \           | |\ \       | |   | | \       | | #######
+// ######  / /      \  \         | | \ \       | |   | |\ \      | | #######
+// ###### | |       |__|        | |   \ \      | |   | | \ \     | | #######
+// ###### | |                  | |     \ \     | |   | |  \ \    | | #######
+// ###### | |    ________     | |_______\ \    | |   | |   \ \   | | #######
+// ###### | |   |______ |    | |         \ \   | |   | |    \ \  | | #######
+// ###### | |         | |   | |           \ \  | |   | |     \ \ | | #######
+// ###### |_|_________|_|  |_|             \_\ |_|   |_|      \_\|_| #######
+// ######                                                            #######
+// ###### _______  __          __   ____  __   ___    __  _______    #######
+// ######    |    |  \   /\   |  \ |     |  \ |   \  /  \    |       #######
+// ######    |    |__/  /__\  |   ||__   |__/ |___/ |    |   |       #######
+// ######    |    |\   /    \ |   ||     |\   |   \ |    |   |       #######
+// ######    |    | \ /      \|__/ |____ | \  |___/  \__/    |       #######
+// ######                                                            #######
+// ######  Comunidade aberta de automatização de estratégias para    #######
+// ######                    negociação de ativos                    #######
+// ######                                                            #######
+// ######                    www.academiahv.com                      #######
+// #########################################################################
+// #########################################################################
+// #########################################################################
+//
+// -----------------------------------------------------------------------
+// ---------------------- DADOS DA ESTRATÉGIA ----------------------------
+// -----------------------------------------------------------------------
+//
+//  NOME DA ESTRATÉGIA: Bot_HeikinAshi
+//    DESENVOLVIDA POR: Héber Silvério
+//     DATA DE CRIAÇÃO: 01/11/2022
+//              VERSÃO: 1.0
+//       ATUALIZADA EM: 03/12/2022
+//  TIPO DE ESTRATÉGIA: ( ) Indicador  ( ) Coloração (X) Execução
+//                      ( ) Screening  ( ) Texto     ( ) Alarme
+//
+// DESCRIÇÃO DA ESTRATÉGIA:
+//      Esta estratégia considera HeikinAshi e Hilo para tomada de decisão
+//
+//  MELHOR PERFORMANCE:
+//    Ativo: WINFUT
+//  Periodo: 25 renko
+// -----------------------------------------------------------------------
+//
+// ######################### FIM DO CABEÇALHO ############################
+//
+// -----------------------------------------------------------------------
+// -------------------------- Constantes ---------------------------------
+// OBS:
+// -----------------------------------------------------------------------
+//const
+//
+// ---------------------------------------------------------------------
+// -------------------------- Parâmetros -------------------------------
+// OBS: Segue abaixo a descriação de cada parâmetro
+// 1) pLimiteSobreComprado -> Limite no qual considera-se que o cruzamento
+// para baixo gere uma operação de venda
+// 2) pLimiteSobreVendido -> Limite no qual considera-se que o cruzamento
+// para cima gere uma operação de compra
+// 3) pTamanhoPosicao -> Tamanho da exposição ao ativo
+// ---------------------------------------------------------------------
+//input
+// ---------------------------------------------------------------------
+// ---------------------- Variáveis globais ----------------------------
+// OBS:
+// ---------------------------------------------------------------------
+var
+  hC,hO : real;
+  SinalCompra : boolean;
+  SinalVenda : boolean;
+  ValorHilo : float;
+  StopGainCompra : boolean;
+  StopGainVenda : boolean;
+  StopLossCompra : boolean;
+  StopLossVenda : boolean;
+  pCompra : float;
+  pVenda : float;
+  DistanciaHiloCompra : boolean;
+  DistanciaHiloVenda : boolean;
+
+  Inicio
+     ValorHilo := (HILOACTIVATOR(21));
+     DistanciaHiloCompra := ((Fechamento - ValorHilo) < 600);
+     DistanciaHiloVenda := ((ValorHilo - Fechamento) < 600);
+     hO := HeikinAshi(1,0)|0|;
+     hC := HeikinAshi(1,0)|1|;
+     SinalCompra := False;
+     SinalVenda := False;
+     StopLossCompra := False;
+     StopLossVenda := False;
+     pCompra := BuyPrice;
+     pVenda := SellPrice;
+     StopGainCompra := ((Maxima - pCompra) >= 500);  
+     StopGainVenda := ((pVenda - Minima) >= 500); 
+
+      Se (hC < hO) e (close > HILOACTIVATOR(21)) então
+         StopLossCompra := True;
+      Se (hC > hO) e (close < HILOACTIVATOR(21)) então 
+         StopLossVenda := True;
+     
+     if ((hC > hO) e (close > HILOACTIVATOR(21)) e (DistanciaHiloCompra = Verdadeiro) ) then
+         SinalCompra := True;
+
+     if ((hC < hO) e (close < HILOACTIVATOR(21)) e (DistanciaHiloVenda = Verdadeiro) ) then
+         SinalVenda := True;
+
+     if (GraphicInterval <> itRenko) or (GraphicOffset <> 25) then
+        //if LastBarOnChart then 
+        plotText("Mudar para renko!", clVermelho, -1, 12);
+   
+   Se (IsSold) então
+      Inicio
+      Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
+            BuyToCoverAtMarket(1);
+      Se ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) então
+            BuyToCoverAtMarket
+      Senão Se ( (SinalCompra = Verdadeiro) ou (Time > 1750) ) então
+         BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought) então
+      Inicio
+      Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
+            SellToCoverAtMarket(1); 
+      Se ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) então
+            SellToCoverAtMarket
+      Senão Se ( (SinalVenda = Verdadeiro) ou (Time > 1750) ) então
+         SellToCoverAtMarket;
+      fim
+   Senão 
+      Inicio
+      Se ( (SinalCompra = Verdadeiro)  e (time < 1700)  ) então
+         BuyAtMarket
+      Senão Se ( (SinalVenda = Verdadeiro) e (time < 1700) )  então
+         SellShortAtMarket;
+      Fim;
+      if (Time >= 1630) and isBought then ClosePosition;
+      if (Time >= 1630) and isSold then ClosePosition;
+
+Fim;

@@ -1,0 +1,111 @@
+//-----------------------------------------------------------------------
+// ---------------------- DADOS DA ESTRATÉGIA ----------------------------
+// -----------------------------------------------------------------------
+//
+//  NOME DA ESTRATÉGIA: Bot_Hilo19_34R_V1
+//    DESENVOLVIDA POR: Héber Silvério
+//     DATA DE CRIAÇÃO: 29/12/2022
+//              VERSÃO: 2.0
+//       ATUALIZADA EM: -
+//  TIPO DE ESTRATÉGIA: ( ) Indicador  ( ) Coloração (X) Execução
+//                      ( ) Screening  ( ) Texto     ( ) Alarme
+//
+// DESCRIÇÃO DA ESTRATÉGIA:
+//      Esta estratégia considera Hilo19 para tomada de decisão
+//      
+//  MELHOR PERFORMANCE:
+//    Ativo: WINFUT
+//  Periodo: 14 renko
+//  Com Stop inicial de 200 - Alvo 250
+//  mais stop movel
+//  (Periodo de teste 01-11-2022 a 29-12-2022)
+// -----------------------------------------------------------------------
+
+Input
+PeriodoHilo(19);
+Stop(170);
+
+var
+resultHilo : Float;
+Subindo : boolean;
+Descendo : boolean;
+SinalCompra: boolean;
+SinalVenda: boolean;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
+pCompra : float;
+pVenda : float;
+LossCompra : boolean;
+LossVenda : boolean;
+valor_LossCompra, valor_lossVenda : float;
+
+Inicio
+   StopGainCompra := False;
+   StopGainVenda := False;
+   SinalCompra := False;
+   SinalVenda := False;
+
+   resultHilo := HiloActivator(PeriodoHilo)|1|;
+   Subindo := (fechamento[1] > fechamento[2]) e (fechamento[2] > fechamento[3]);
+   Descendo := (fechamento[1] < fechamento[2]) e (fechamento[2] < fechamento[3]);
+
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   if ((Maxima - pCompra) > 150) then
+      StopGainCompra := True;
+   if ((pVenda - Minima) > 150) then
+      StopGainVenda := True;
+
+   valor_LossCompra := BuyPrice - (Stop);
+   LossCompra := (Fechamento < valor_LossCompra);
+
+   valor_lossVenda := SellPrice + (Stop);
+   LossVenda := (Fechamento > valor_lossVenda);
+
+   if (fechamento > fechamento[1]) e (Descendo = Verdadeiro) e (resultHilo = 1) then
+      SinalCompra := True;
+   if (fechamento < fechamento[1]) e (Subindo = Verdadeiro) e (resultHilo = 0) then
+      SinalVenda := True;
+
+
+   Se (IsSold) então
+      Inicio
+         Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
+               BuyToCoverAtMarket(1);
+         Se ( (LossVenda = Verdadeiro) ou (Time > 1750) ) então
+               BuyToCoverAtMarket
+         Senão se (Low[2] < Low[3]) and (Low[1] < Low[2]) então 
+            BuyToCoverStop(High[3]);
+      fim;
+   Se (IsBought) então
+      Inicio
+         Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
+               SellToCoverAtMarket(1); 
+         Se ( (LossCompra = Verdadeiro) ou (Time > 1750) ) então
+               SellToCoverAtMarket
+         Senão se (High[2] > High[3]) and (High[1] > High[2]) então
+            SellToCoverStop(Low[3]);
+      fim;
+      
+   Se (BuyPosition = 0) e (SellPosition = 0) então //Verifica se existe posição
+      Inicio
+         Se (SinalCompra = Verdadeiro) então
+         Inicio
+            BuyAtMarket;
+         Fim;
+         
+         Se (SinalVenda = Verdadeiro) então
+         Inicio
+            SellShortAtMarket;
+         Fim;
+      Fim;
+
+   if (Time >= 1759) and isBought then ClosePosition;
+   if (Time >= 1759) and isSold then ClosePosition;
+
+    //Coloração
+   if (SinalCompra = Verdadeiro) then 
+      PaintBar(clVerde);
+   if (SinalVenda = Verdadeiro) then 
+      PaintBar(clMarrom);
+Fim;

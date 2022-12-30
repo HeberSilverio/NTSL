@@ -1,0 +1,201 @@
+// #######################################################################
+// #######################################################################
+// #######################################################################
+// ######                            O                             #######
+// ######                        ____|____                         #######
+// ######                      _|         |_                       #######
+// ######                     (_|  O   O  |_)                      #######
+// ######                       |_________|                        #######
+// ######                                                          #######
+// ###### ____        __        ____________           ________    #######
+// ###### | | \       | |       | |_________|         /  ____  \   #######
+// ###### | |\ \      | |       | |                  /  /    \  \  #######
+// ###### | | \ \     | |       | |____             |  |      |  | #######
+// ###### | |  \ \    | |       | |____|            |  |      |  | #######
+// ###### | |   \ \   | |       | |____|            |  |      |  | #######
+// ###### | |    \ \  | |       | |                 |  |      |  | #######
+// ###### | |     \ \ | |       | |_________         \  \____/  /  #######
+// ###### |_|      \_\|_|       |_|_________|         \________/   #######
+// ######                                                          #######
+// ###### _______  __          __   ____  __   ___    __  _______  #######
+// ######    |    |  \   /\   |  \ |     |  \ |   \  /  \    |     #######
+// ######    |    |__/  /__\  |   ||__   |__/ |___/ |    |   |     #######
+// ######    |    |\   /    \ |   ||     |\   |   \ |    |   |     #######
+// ######    |    | \ /      \|__/ |____ | \  |___/  \__/    |     #######
+// ######                                                          #######
+// ######  Comunidade aberta de automatização de estratégias para  #######
+// ######                    negociação de ativos                  #######
+// ######                                                          #######
+// ######                    www.NeoTraderBot.com                  #######
+// #######################################################################
+// #######################################################################
+// #######################################################################
+//
+// -----------------------------------------------------------------------
+// ---------------------- DADOS DA ESTRATÉGIA ----------------------------
+// -----------------------------------------------------------------------
+//
+// NOME DA ESTRATÉGIA: _NeoTraderBot_SharkFlow
+//   DESENVOLVIDA POR: Johnathas Carvalho
+//    DATA DE CRIAÇÃO: 22/12/2022
+//             VERSÃO: 1.0
+//      ATUALIZADA EM: 22/12/2022
+// TIPO DE ESTRATÉGIA: ( ) Indicador  (X) Coloração ( ) Execução
+//                     ( ) Screening  ( ) Texto     ( ) Alarme
+//
+// DESCRIÇÃO DA ESTRATÉGIA:
+//    Esta estratégia, inicialmente implementada como coloração, visa indicar
+// o fluxo dos tubarões (Big players, Institucionais). O SHARKFLOW concilia 3 
+// dimensões importantes de trading: movimentação de preço acima da média, 
+// volume relevante e agressão acumulada na direção de movimentação do preço.
+// Embarque no fluxo dos tubarões e aumente a taxa de acerto e lucro de suas
+// estratégias e robôs! 
+// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+//
+// ######################### FIM DO CABEÇALHO ############################
+
+// ---------------------------------------------------------------------
+// -------------------------- Parâmetros -------------------------------
+// OBS: Segue abaixo a descriação de cada parâmetro
+// 1) pGatilhoVolatilidade -> Qtde de desvio padrão em relação à média 
+// de volatilidade de preço para considerar uma movimentação direcional
+// 2) pQtdePeriodosVolat -> Qtde de períodos para tomar a média da volatilidade
+// de preço dos ativos
+// 3) pQtdePeriodosMediaVolume -> Qtde de períodos para se calcular
+// o volume médio negociado
+// 4) pQtdeDesvioVolume -> Qtde de desvio padrão do volume negociado para
+// se considerar o volume negociado RELEVANTE
+// 5) pQtdeBarrasRecentesParaCalculo -> Caso haja problemas de lentidão
+// em seu Profit, pode-se configurar esta estratégia para ser calculada
+// apenas nos últimos X candles. Caso deseje calcular para toda série
+// histórica mantenha o valor igual a 0.
+// ---------------------------------------------------------------------
+input
+  pGatilhoVolatilidade(1.5);
+  pQtdePeriodosVolat(180);
+  pQtdePeriodosMediaVolume(180);
+  pQtdePeriodosAcumAgressao(3);
+  pQtdeDesvioVolume(1.5);
+  pQtdeBarrasRecentesParaCalculo(0);
+
+var
+  // Variáveis para indicador de Volume Relevante
+  fMedia, fStdDev: float;
+  fVolumeRelevante: float;
+  // --------------------------------------------
+
+  // Variáveis para indicador de Volatilidade Média
+  fMediaMax, fMediaMin: float;
+  // --------------------------------------------
+
+  // Variáveis para indicador de Agressão Acumulada
+  bSentidoAgressao, bSentidoAgressaoAnt : boolean; // True -> agressão de compra, False -> agressão de venda
+  fSaldoVolumeAgressao: float;
+  fSaldoAcumuladoAgressao: float;
+  iUltimaReversaoSaldo: integer;
+  // --------------------------------------------
+
+
+  fVolatilidadeMediaEmTicks: float;
+  fRangeAtualEmTicks: float;
+  fStdVolatilidade: float;
+  iQtdeConfirmacoes: integer;
+  cCorCandleGatilho: integer;
+begin
+
+fSaldoVolumeAgressao := AgressionVolBalance;
+bSentidoAgressao := AgressionVolBalance > 0;
+
+if (MaxBarsForward <= pQtdeBarrasRecentesParaCalculo) or (pQtdeBarrasRecentesParaCalculo = 0)  then
+begin
+
+// -----------------------------------------------------------------------
+// ------------- REPLICAÇÃO DO CÓDIGO DE VOLUME RELEVANTE ----------------
+// -----------------------------------------------------------------------
+// Devido à ineficiencias do Profit e visando otimizar o presente indicador,
+// tornou-se necessário trazer o código fonte do indicador de Volume Relevante
+// para dentro desse indicador
+  fMedia := Media(pQtdePeriodosMediaVolume, Volume);
+  fStdDev := StdDevs(Volume, pQtdePeriodosMediaVolume);
+  if (fMedia + pQtdeDesvioVolume*fStdDev) <> 0  then
+    fVolumeRelevante := Volume/(fMedia + pQtdeDesvioVolume*fStdDev);
+// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+
+// -----------------------------------------------------------------------
+// ------------ REPLICAÇÃO DO CÓDIGO DE VOLATILIDADE MÉDIA ---------------
+// -----------------------------------------------------------------------
+// Devido à ineficiencias do Profit e visando otimizar o presente indicador,
+// tornou-se necessário trazer o código fonte do indicador de Volatilidade 
+// Média para dentro desse indicador
+  fMediaMax := Summation(High,pQtdePeriodosVolat);
+  fMediaMin := Summation(Low,pQtdePeriodosVolat);
+  fVolatilidadeMediaEmTicks := Ceiling((fMediaMax - fMediaMin)/pQtdePeriodosVolat/MinPriceIncrement);
+// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+
+
+// -----------------------------------------------------------------------
+// ------------ REPLICAÇÃO DO CÓDIGO DE AGRESSÃO ACUMULADA ---------------
+// -----------------------------------------------------------------------
+// Devido à ineficiencias do Profit e visando otimizar o presente indicador,
+// tornou-se necessário trazer o código fonte do indicador de Volatilidade 
+// Média para dentro desse indicador
+  if (pQtdePeriodosAcumAgressao = 0) then
+  begin
+    fSaldoAcumuladoAgressao := fSaldoVolumeAgressao;
+
+    iUltimaReversaoSaldo := 1;
+    bSentidoAgressaoAnt := fSaldoVolumeAgressao[iUltimaReversaoSaldo] > 0; 
+
+    while (bSentidoAgressaoAnt = bSentidoAgressao) and ((CurrentBar - iUltimaReversaoSaldo) >= 1) do
+    begin
+      fSaldoAcumuladoAgressao := fSaldoAcumuladoAgressao + fSaldoVolumeAgressao[iUltimaReversaoSaldo];
+      iUltimaReversaoSaldo := iUltimaReversaoSaldo + 1;
+      bSentidoAgressaoAnt := fSaldoVolumeAgressao[iUltimaReversaoSaldo] > 0; 
+    end;
+
+  end
+  else fSaldoAcumuladoAgressao := Summation(fSaldoVolumeAgressao, pQtdePeriodosAcumAgressao);   
+           
+              
+// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------    
+
+  iQtdeConfirmacoes := 0;
+  cCorCandleGatilho := clYellow;
+
+  fRangeAtualEmTicks := Ceiling((High - Low)/MinPriceIncrement);
+  fStdVolatilidade := StdDevs(fVolatilidadeMediaEmTicks, pQtdePeriodosVolat);
+
+  // Tem volume relevante
+  if fVolumeRelevante >= 1 then iQtdeConfirmacoes := iQtdeConfirmacoes + 1;
+
+  // Tem volatilidade considerável
+  if (fRangeAtualEmTicks >= (fVolatilidadeMediaEmTicks + pGatilhoVolatilidade*fStdVolatilidade)) 
+  then iQtdeConfirmacoes := iQtdeConfirmacoes + 1;
+
+  // Volatilidade é direcionada no mesmo sentido da agressão
+  if ((fSaldoAcumuladoAgressao > 0) and (Close > Open)) then
+  begin
+    cCorCandleGatilho := clGreen; 
+    iQtdeConfirmacoes := iQtdeConfirmacoes + 1;
+  end;
+  if ((fSaldoAcumuladoAgressao < 0) and (Close < Open)) then 
+  begin
+    cCorCandleGatilho := clRed;
+    iQtdeConfirmacoes := iQtdeConfirmacoes + 1;
+  end;
+
+
+  if iQtdeConfirmacoes = 3 then PaintBar(cCorCandleGatilho);
+  
+
+end;
+
+end;

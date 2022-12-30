@@ -1,0 +1,20 @@
+input
+pQuantMaximas(20);
+pQuantDesvio(20);
+var
+  topox, fundox : float;
+begin
+   
+   topox := HIGHEST(Maxima, pQuantMaximas)[pQuantDesvio];
+   fundox := lowest(low, pQuantMaximas)[pQuantDesvio];
+   
+   Plot(topox);
+   Plot2(fundox);
+   
+
+   if (Fechamento > topox) then 
+      PaintBar(clVerde);
+   if (Fechamento < fundox) then 
+      PaintBar(clMarrom);
+   
+end;
