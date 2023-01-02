@@ -1,0 +1,61 @@
+//-----------------------------------------------------------------------
+// ---------------------- DADOS DA ESTRATÉGIA ----------------------------
+// -----------------------------------------------------------------------
+//
+//  NOME DA ESTRATÉGIA: Bot_Hilo19_34R_V2-parcial
+//    DESENVOLVIDA POR: Héber Silvério
+//     DATA DE CRIAÇÃO: 29/12/2022
+//              VERSÃO: 2.0
+//       ATUALIZADA EM: 31/12/2022
+//  TIPO DE ESTRATÉGIA: ( ) Indicador  (X) Coloração ( ) Execução
+//                      ( ) Screening  ( ) Texto     ( ) Alarme
+//
+// DESCRIÇÃO DA ESTRATÉGIA:
+//      Esta estratégia considera Hilo19 para tomada de decisão
+//      
+//  MELHOR PERFORMANCE:
+//    Ativo: WINFUT
+//  Periodo: 16 renko
+//  HISTÓRIA: Se ANDAR menos de 500 pts e fechar um candle contra encerra, se passar de 500 pontos muda para stop movel
+//  Pode colocar Parcial no parâmetro. Parcial padrão com 1000.
+//  PAR
+//  (Periodo de teste 01-11-2022 a 29-12-2022)
+// -----------------------------------------------------------------------
+Input
+PeriodoHilo(19);
+
+var
+   
+resultHilo : Float;
+Subindo : boolean;
+Descendo : boolean;
+SinalCompra : boolean;
+SinalVenda : boolean;
+Compra1 : boolean;
+Compra2 : boolean;
+Venda1 : boolean;
+Venda2 : boolean;
+begin
+   
+   SinalCompra := False;
+   SinalVenda := False;
+
+   resultHilo := HiloActivator(PeriodoHilo)|1|;
+   Subindo := (fechamento[1] > fechamento[2]) e (fechamento[2] > fechamento[3]);
+   Descendo := (fechamento[1] < fechamento[2]) e (fechamento[2] < fechamento[3]);
+   Compra1 := (fechamento > fechamento[1]) e (Descendo = Verdadeiro) ;
+   Compra2 := (Fechamento > Abertura[1]) e (Minima < Minima[1]) e (Subindo);
+   Venda1 := (fechamento < fechamento[1]) e (Subindo = Verdadeiro);
+   Venda2 := (Fechamento < Abertura[1]) e (Fechamento[1] < Abertura[1]) e (Fechamento[2] < Abertura[2]) e (Maxima > Maxima[1]);
+
+   if (Compra1 = Verdadeiro) ou (Compra2 = Verdadeiro) then
+      SinalCompra := True;
+   if (Venda1 = Verdadeiro) ou (Venda2 = Verdadeiro) then
+      SinalVenda := True;
+   
+   //Coloração
+   if (SinalCompra = Verdadeiro) e (resultHilo = 1) then 
+      PaintBar(clVerde);
+   if (SinalVenda = Verdadeiro) e (resultHilo = 0) then 
+      PaintBar(clMarrom);
+end;

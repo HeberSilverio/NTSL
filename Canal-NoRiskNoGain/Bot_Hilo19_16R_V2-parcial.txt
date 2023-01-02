@@ -15,19 +15,20 @@
 //      
 //  MELHOR PERFORMANCE:
 //    Ativo: WINFUT
-//  Periodo: 14 renko
-//  HISTÓRIA: Se ANDAR menos de 500 pts e fechar um candle contra encerra, se passar de 500 pontos muda para stop movel
-//  Pode colocar Parcial no parâmetro. Parcial padrão com 1000.
-//  PAR
+//  Periodo: 16 renko
+//  HISTÓRIA: Se fechar um candle contra encerra, 
+//            Pode colocar Parcial no parâmetro. Parcial padrão com 1000.
+// PROBLEMAS:
+//    1. Stop movel entra mas será ignorado.
+//    2. A QUANTIDADE DE CONTRATOS PARA PARCIAL ESTÁ MANUAL   
+//  mais stop movel
 //  (Periodo de teste 01-11-2022 a 29-12-2022)
 // -----------------------------------------------------------------------
 Input
 PeriodoHilo(19);
-Stop(170);
+//Stop(170);
 Parcial(1000);
 StopMovelApartir(500);
-ContratosPosicao(2);
-ContratosParcial(1);
 
 var
    
@@ -38,8 +39,7 @@ SinalCompra: boolean;
 SinalVenda: boolean;
 StopGainCompra : boolean;
 StopGainVenda : boolean;
-StopMovelCompra : boolean;
-StopMovelVenda : boolean;
+StopMovel : boolean;
 pCompra : float;
 pVenda : float;
 LossCompra : boolean;
@@ -52,8 +52,7 @@ begin
    StopGainVenda := False;
    SinalCompra := False;
    SinalVenda := False;
-   StopMovelCompra := False;
-   StopMovelVenda := False;
+   StopMovel := False;
 
    resultHilo := HiloActivator(PeriodoHilo)|1|;
    Subindo := (fechamento[1] > fechamento[2]) e (fechamento[2] > fechamento[3]);
@@ -68,18 +67,18 @@ begin
       StopGainVenda := True;
 
    //Stop movel a partir de 500   
-   if ((Maxima - pCompra) > StopMovelApartir) e (High[2] > High[3]) and (High[1] > High[2]) then
-      StopMovelCompra := True;
-   if ((pVenda - Minima) > StopMovelApartir) e (Low[2] < Low[3]) and (Low[1] < Low[2]) then
-      StopMovelVenda := True;
+   if ((Maxima - pCompra) > StopMovelApartir) then
+      StopMovel := True;
+   if ((pVenda - Minima) > StopMovelApartir) then
+      StopMovel := True;
 
-   valor_LossCompra := Low + (range * 0.9);
+   valor_LossCompra := Low + (range * 0.6);
    //valor_LossCompra := BuyPrice - (Stop);
-   LossCompra := (Fechamento < valor_LossCompra) e ((Maxima - pCompra) < StopMovelApartir);
+   LossCompra := (Fechamento < valor_LossCompra);
 
-   valor_lossVenda := High - (range * 0.9);
+   valor_lossVenda := High - (range * 0.6);
    //valor_lossVenda := SellPrice + (Stop);
-   LossVenda := (Fechamento > valor_lossVenda) e ((pVenda - Minima) < StopMovelApartir);
+   LossVenda := (Fechamento > valor_lossVenda);
 
    if (fechamento > fechamento[1]) e (Descendo = Verdadeiro) e (resultHilo = 1) then
       SinalCompra := True;
@@ -89,23 +88,22 @@ begin
 
    Se (IsSold) então
       Inicio
-         Se (SellPosition = ContratosPosicao) and (StopGainVenda = Verdadeiro) então
-               BuyToCoverAtMarket(ContratosParcial);
+         Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
+               BuyToCoverAtMarket(1);
          Se ( (LossVenda = Verdadeiro) ou (Time > 1750) ) então
                BuyToCoverAtMarket
-         //condição para stop movel     
-         Senão Se (StopMovelVenda = Verdadeiro) então
+         Senão Se (Low[2] < Low[3]) and (Low[1] < Low[2]) então 
                BuyToCoverStop(High[3]);
       fim;
       
    Se (IsBought) então
       Inicio
-         Se (BuyPosition = ContratosPosicao) and (StopGainCompra = Verdadeiro) então
-               SellToCoverAtMarket(ContratosParcial); 
+         Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
+               SellToCoverAtMarket(1); 
          Se ( (LossCompra = Verdadeiro) ou (Time > 1750) ) então
                SellToCoverAtMarket
-            //condição para stop movel   
-         Senão Se (StopMovelCompra = Verdadeiro) então
+         
+         Senão Se (High[2] > High[3]) and (High[1] > High[2]) então
               SellToCoverStop(Low[3]);
       fim;
       
@@ -113,12 +111,12 @@ begin
       Inicio
          Se (SinalCompra = Verdadeiro) então
          Inicio
-            BuyAtMarket(ContratosPosicao);
+            BuyAtMarket;
          Fim;
          
          Se (SinalVenda = Verdadeiro) então
          Inicio
-            SellShortAtMarket(ContratosPosicao);
+            SellShortAtMarket;
          Fim;
       Fim;
 

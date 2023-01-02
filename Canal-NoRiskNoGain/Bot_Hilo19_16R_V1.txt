@@ -15,7 +15,7 @@
 //      Stop de 220 e alvo de 1.6
 //  MELHOR PERFORMANCE:
 //    Ativo: WINFUT
-//  Periodo: 34 renko
+//  Periodo: 16 renko
 //  Com Stop 200 - Alvo 1.6 - 67,5% Acerto
 //  Com Stop 220 - Alvo 1.6 - 64,4% Acerto
 //  (Periodo de teste 01-11-2022 a 29-12-2022)
